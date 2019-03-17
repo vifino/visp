@@ -1,17 +1,18 @@
--- Tokenizer.
+-- Tokenizer and Parser.
 -- The tkn() function is from 20kdc.
 
-local tokenizer = {}
+local parser = {}
 
 -- For a string, removes whitespace, and splits it
 --  into the token, the token type, and the remainder.
+local patterns = {
+	{"^['()]", "char"},
+	{"^\"[^\"]*\"", "string"}, -- If escapes are needed, this needs special handling.
+	{"^[^ \r\n\t'()]*", "id"}
+}
+
 local function tkn(s)
 	s = s:gsub("^[ \r\n\t]+", "")
-	local patterns = {
-		{"^['()]", "char"},
-		{"^\"[^\"]*\"", "string"}, -- If escapes are needed, this needs special handling.
-		{"^[^ \r\n\t'()]*", "id"}
-	}
 	for _, v in ipairs(patterns) do
 		local m = s:match(v[1])
 		if m then
@@ -21,9 +22,13 @@ local function tkn(s)
 	return nil, nil, s
 end
 
+-- Expression reader.
+-- Takes a string and returns an equivalent AST.
 local readsexpr -- read a single sexpr
 readsexpr = function(str)
-	local res = {}
+	local res = {
+		["type"] = "expr"
+	}
 
 	local found_exp = false
 	local tok, tkt
@@ -42,29 +47,38 @@ readsexpr = function(str)
 			end
 			return res, str
 		else
-			res[#res + 1] = tok
+			local elm = {tok}
+			elm.type = tkt
+			res[#res + 1] = elm
 		end
 		ostr = str
 	until (found_tok or #str == 0)
 	return nil, str  -- found no expression
 end
-tokenizer.readsexpr = readsexpr
+parser.readsexpr = readsexpr
 
+-- Expression dumper.
+-- Takes an AST and returns an equivalent string.
 local dumpexpr
 dumpexpr = function(expr, fh)
 	fh = fh or io.stdout
 	fh:write("(")
 	local last = #expr
 	for i=1, last do
-		local tok = expr[i]
-		if type(tok) == "string" then
-			fh:write(tok .. ((i == last) and "" or " "))
-		elseif type(tok) == "table" then
-			dumpexpr(tok, fh)
+		local elm = expr[i]
+		if type(elm) ~= "table" then error("invalid sexpr tree?", 1) end
+		if elm.type == "expr" then
+			dumpexpr(elm, fh)
+		else
+			local space = (i == last) and "" or " "
+			local tok
+			if elm.type == "id" then tok = elm[1]
+			elseif elm.type == "string" then tok = '"'..elm[1]..'"' end -- replace this
+			fh:write(tok .. space)
 		end
 	end
 	fh:write(")")
 end
-tokenizer.dumpexpr = dumpexpr
+parser.dumpexpr = dumpexpr
 
-return tokenizer
+return parser

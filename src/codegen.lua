@@ -33,11 +33,14 @@ end
 local cg_loadstr
 if load then
 	cg_loadstr = function(self, code)
-		return assert(loadstr(code, nil, 't', self.G))
+		local f, e = loadstr("return ".. code, nil, "t", self.G)
+		if e then return assert(loadstr(code, nil, "t", self.G)) end
+		return f
 	end
 else
 	cg_loadstr = function(self, code)
-		local f = assert(loadstring(code))
+		local f, e = loadstring("return ".. code)
+		if e then f = assert(loadstring(code)) end
 		sfe(f, self.G)
 		return f
 	end
@@ -52,10 +55,6 @@ local gethash = function(val)
 	error(1, "can't find hash of non-function")
 end
 cg.gethash = gethash
-
-local caller = function(self, fn)
-	return "(" .. hash .. ")"	
-end
 
 local cg_parse
 cg_parse = function(self, chain, depth) -- recursive solution
@@ -77,12 +76,12 @@ cg_parse = function(self, chain, depth) -- recursive solution
 			self.G[hash] = elem
 			out[i] = pad .. "("..hash..")" -- not the best, but it'll do
 		elseif elt == "string" then
-			out[i] = pad .. elem .. "\n"
+			out[i] = pad .. elem
 		else
 			out[i] = tostring(elem)
 		end
 	end
-	return tconc(out)
+	return tconc(out, "\n")
 end
 cg.parse = cg_parse
 
@@ -94,10 +93,10 @@ cg.load = cg_load
 
 local cg_def = function(self, name, chain)
 	local v = self.fns[name]
-	if not v then 
+	if not v then
 		v = cg_parse(self, chain, 1)
 		local fnbody = name.." = function(...)\n" .. v .. "\nend\n"
-	
+
 		if self.aot then
 			self.fh:write("local " .. fnbody)
 		else
@@ -114,10 +113,10 @@ local cg_run = function(self, snippet, ...)
 	if self.aot then
 		error(1, "can't run with AOT enabled")
 	end
-	local v = self.G[snippet]
+	local v = self.C[snippet]
 	if v then return v(...) end
 	v = cg_load(self, snippet)
-	self.G[snippet] = v
+	self.C[snippet] = v
 	return v(...)
 end
 cg.run = cg_run
