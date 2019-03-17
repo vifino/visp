@@ -1,15 +1,24 @@
 -- Tokenizer.
--- Most of it is from 20kdc.
+-- The tkn() function is from 20kdc.
 
 local tokenizer = {}
 
+-- For a string, removes whitespace, and splits it
+--  into the token, the token type, and the remainder.
 local function tkn(s)
-	s=s:gsub("^[ \r\n\t]+","")
-	if s:match("^['()]") then
-		return s:sub(1,1), s:sub(2)
+	s = s:gsub("^[ \r\n\t]+", "")
+	local patterns = {
+		{"^['()]", "char"},
+		{"^\"[^\"]*\"", "string"}, -- If escapes are needed, this needs special handling.
+		{"^[^ \r\n\t'()]*", "id"}
+	}
+	for _, v in ipairs(patterns) do
+		local m = s:match(v[1])
+		if m then
+			return m, v[2], s:sub(#m + 1)
+		end
 	end
-	local q=s:match("^[^ \r\n\t'()]*")
-	return q, s:sub(#q+1)
+	return nil, nil, s
 end
 
 local readsexpr -- read a single sexpr
@@ -17,10 +26,10 @@ readsexpr = function(str)
 	local res = {}
 
 	local found_exp = false
-	local tok
+	local tok, tkt
 	local ostr = str
 	repeat
-		tok, str = tkn(str)
+		tok, tkt, str = tkn(str)
 		if not tok then return nil end
 		if tok == "(" then -- start expression
 			if not found_exp then found_exp = true else
