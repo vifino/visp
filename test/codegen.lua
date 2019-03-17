@@ -14,6 +14,7 @@ local hello_f = inst:loadstr(hello_tree[1])
 print(hello_f)
 hello_f()
 print(cg.gethash(hello_f))
+
 -- Codegen
 print("codegen:")
 local adder_fun_tree = {
@@ -47,3 +48,22 @@ inst:def("hello", {
 })
 
 inst.G.hello("CG")
+
+-- Expressions
+print("expressions:")
+inst.G.select = select
+local function arg(n)
+	return "(select("..tonumber(n)..", ...))"
+end
+local function op(op, a, b)
+	return "("..tostring(a).." " .. op .. " " .. tostring(b)..")"
+end
+
+local expr_tree = {
+	op("+", op("-", 100, 50), 25),
+	"+ ("..arg(1).." or 10)"
+}
+local expr_code = inst:parse(expr_tree)
+print(expr_code)
+local expr_fn = inst:loadstr(expr_code)
+print(expr_fn())
