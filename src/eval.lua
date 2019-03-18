@@ -6,10 +6,12 @@ local eval = {}
 local cg = require("src.codegen")
 local p = require("src.parser")
 
+local unpack = table.unpack
+
 -- New evaluator.
 eval.new = function()
 	local n = {
-		special = {}, -- syntax handling functions
+		cgfns = {}, -- code generating functions, mostly syntax and builtins
 		jit = cg.new()
 	}
 	n.vals = n.jit.G
@@ -27,19 +29,17 @@ parse_ast = function(self, ast)
 		return "("..ast[1]..")"
 	elseif ast.type == "expr" then
 		local fn = ast[1]
-		local J = self.jit
 		if (type(fn) ~= "table") or (not fn.type) then error("expr[1] not ast??", 1) end
 		if fn.type == "id" then -- call, the "normal"
 			local name = fn[1]
-			if name:sub(1,1) == "$" then -- special form!
+			if self.cgfns[name] then -- special form!
 				-- since we're JITting, only the special form gets evaluated
 				-- unlike the rest, which just gets emitted.
-				local sfn = name:sub(2)
-				if not self.special[sfn] then
-					error("tried to call special "..sfn.." which does not exist.", 1)
-				end
-				return self.special[sfn](self, unpack(ast, 2))
+				-- the cgfns return a call graph.
+				-- it gets the sub ast nodes as arguments
+				return self.cgfns[name](self, unpack(ast, 2))
 			else
+				-- we don't know this function, just emit a call.
 				local g = {
 					"("..name.."("
 				}

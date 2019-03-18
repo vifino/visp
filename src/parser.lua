@@ -26,6 +26,7 @@ end
 -- Takes a string and returns an equivalent AST.
 local readsexpr -- read a single sexpr
 readsexpr = function(str)
+	if type(str) ~= "string" then error("invalid input: not string, is type "..type(str), 1) end
 	local res = {
 		["type"] = "expr"
 	}
@@ -33,6 +34,7 @@ readsexpr = function(str)
 	local found_exp = false
 	local tok, tkt
 	local ostr = str
+	local sstr = str
 	repeat
 		tok, tkt, str = tkn(str)
 		if not tok then return nil end
@@ -43,7 +45,7 @@ readsexpr = function(str)
 			end
 		elseif tok == ")" then
 			if not found_exp then
-				error("unmatched parens: "..str, 1)
+				error("unmatched parens (too many): "..sstr, 1)
 			end
 			return res, str
 		else
@@ -53,7 +55,12 @@ readsexpr = function(str)
 			res[#res + 1] = elm
 		end
 		ostr = str
-	until (found_tok or #str == 0)
+	until #str == 0
+
+	if found_exp then
+		error("unmatched parens (too few): "..sstr, 1)
+	end
+
 	return nil, str  -- found no expression
 end
 parser.readsexpr = readsexpr
@@ -66,7 +73,7 @@ dumpexpr = function(expr)
 	local last = #expr
 	for i=1, last do
 		local elm = expr[i]
-		if type(elm) ~= "table" then error("invalid sexpr tree?", 1) end
+		if (not (type(elm) == "table" and elm.type)) then error("invalid sexpr tree?", 1) end
 		if elm.type == "expr" then
 			str = str .. dumpexpr(elm)
 		else
