@@ -11,7 +11,10 @@ end
 
 local function genop1(_, op)
 	return function(ev, arg)
-		return {op, ev:parse(first)}
+		return {
+			["type"] = "expr",
+			op, ev:parse(first)
+		}
 	end
 end
 
@@ -22,7 +25,10 @@ local function genop2(_, op)
 		if nopers == 0 then
 			error("need more args in op: "..op..", need 2+, got "..tostring(nopers+1))
 		end
-		local t = {"(", ev:parse(first), op}
+		local t = {
+			["type"] = "expr",
+			"(", ev:parse(first), op
+		}
 		for i=1, nopers do
 			t[#t+1] = ev:parse(opers[i])
 			if i ~= nopers then t[#t+1] = op end
