@@ -1,4 +1,5 @@
--- Basic visp spec.
+-- Basic visp builtin spec.
+
 describe("#visp", function()
 	local visp
 	setup(function()

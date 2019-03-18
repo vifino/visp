@@ -1,0 +1,7 @@
+# Editor swap files.
+.#*
+*.swp
+*.un~
+
+# Coveralls config contains tokens.
+.coveralls.yml

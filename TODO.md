@@ -2,7 +2,7 @@
 # Compilers
 ## Stage 0 (Lua Bootstrap Compiler/Runtime)
 * Lua interpreter/JIT.
-* Bare essentials, no(t much) compliance.
+* Bare essentials, "just enough" compliance.
 * With the JIT, should be decently performing.
 * Keep up to date to prevent bloat and bitrot.
 
@@ -11,13 +11,24 @@
 - [x] AST formatter/dumper. Should be compilable!
 - [x] Basic evaluator
 - [ ] Primitives
-- [ ] Builtins
-  - [ ] Numbers
-  - [ ] Chars
+  - [x] Numbers
+  - [x] Booleans
+  - [x] IDs/references
   - [ ] Lists
-  - [ ] Strings
+    - This is really important.
+  - [?] Strings
+- [ ] Builtins
+  - [x] Control statements
+    - We got cond!
+  - [ ] Global definition
+    - [ ] Variables/Functions
+    - [ ] Syntax
+  - [ ] Local definition
+    - [ ] Variables/Functions
+  - [ ] Char handling
+  - [ ] List handling
+  - [ ] String handling
   - [ ] Comparisons
-  - [ ] Control statements
 - [ ] Scheme standard library.
 
 ## Stage 1 (Lisp compiler running on Stage 0)
