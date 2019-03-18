@@ -42,7 +42,7 @@ parse_ast = function(self, ast)
 			else
 				-- we don't know this function, just emit a call.
 				local g = {
-a					["type"] = "expr",
+					["type"] = "expr",
 					"("..name.."("
 				}
 				local last = #ast

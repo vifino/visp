@@ -31,7 +31,7 @@ end
 
 -- Lua code loading
 local cg_loadstr
-if load then
+if not sfe then
 	cg_loadstr = function(self, code)
 		local f, e = loadstr("return ".. code, nil, "t", self.G)
 		if e then return assert(loadstr(code, nil, "t", self.G)) end
