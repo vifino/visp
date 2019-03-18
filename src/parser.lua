@@ -49,6 +49,7 @@ readsexpr = function(str)
 		else
 			local elm = {tok}
 			elm.type = tkt
+			if not found_exp then return elm end -- ooc expr
 			res[#res + 1] = elm
 		end
 		ostr = str
@@ -60,24 +61,23 @@ parser.readsexpr = readsexpr
 -- Expression dumper.
 -- Takes an AST and returns an equivalent string.
 local dumpexpr
-dumpexpr = function(expr, fh)
-	fh = fh or io.stdout
-	fh:write("(")
+dumpexpr = function(expr)
+	local str = "("
 	local last = #expr
 	for i=1, last do
 		local elm = expr[i]
 		if type(elm) ~= "table" then error("invalid sexpr tree?", 1) end
 		if elm.type == "expr" then
-			dumpexpr(elm, fh)
+			str = str .. dumpexpr(elm)
 		else
 			local space = (i == last) and "" or " "
 			local tok
 			if elm.type == "id" then tok = elm[1]
 			elseif elm.type == "string" then tok = '"'..elm[1]..'"' end -- replace this
-			fh:write(tok .. space)
+			str = str .. tok .. space
 		end
 	end
-	fh:write(")")
+	return str .. ")"
 end
 parser.dumpexpr = dumpexpr
 

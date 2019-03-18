@@ -7,9 +7,9 @@
 * Keep up to date to prevent bloat and bitrot.
 
 - [x] Codegen library
-- [ ] Basic tokenizer/lexer/parser
-- [ ] AST formatter/dumper. Should be compilable!
-- [ ] Basic evaluator
+- [x] Basic tokenizer/lexer/parser
+- [x] AST formatter/dumper. Should be compilable!
+- [x] Basic evaluator
 - [ ] Primitives
 - [ ] Builtins
   - [ ] Numbers

@@ -21,7 +21,7 @@ cg.new = function(aot_fh)
 		C = {},
 		G = {},
 		fns = {},
-		aot=aot_fh and true or false,
+		aot=(aot_fh and true) or false,
 		fh = aot_fh,
 	}
 	inst.G["_G"] = inst.G
@@ -52,7 +52,7 @@ local gethash = function(val)
 	if type(val) == "function" then
 		return strsub(tostring(val), 13) -- dirty hack
 	end
-	error(1, "can't find hash of non-function")
+	error("can't find hash of non-function", 1)
 end
 cg.gethash = gethash
 
@@ -60,7 +60,8 @@ local cg_parse
 cg_parse = function(self, chain, depth) -- recursive solution
 	local depth = depth or 0
 	local pad = strrep("\t", depth)
-	if type(chain) == "string" then return pad .. snippet end
+	if type(chain) == "string" then return pad .. chain
+	elseif type(chain) ~= "table" then error("chain not string or table", 1) end
 
 	local out = {}
 	for i=1, #chain do
@@ -70,7 +71,7 @@ cg_parse = function(self, chain, depth) -- recursive solution
 			out[i] = cg_parse(self, elem, depth + 1)
 		elseif elt == "function" then
 			if self.aot then
-				error(1, "can't run compiled function in AOT mode")
+				error("can't run compiled function in AOT mode", 1)
 			end
 			local hash = "fcn_" .. gethash(elem)
 			self.G[hash] = elem
@@ -87,7 +88,7 @@ cg.parse = cg_parse
 
 -- Loading helpers
 local cg_load = function(self, chain)
-	return cg_loadstr(self, cg_parse(self, parse))
+	return cg_loadstr(self, cg_parse(self, chain))
 end
 cg.load = cg_load
 
@@ -111,7 +112,7 @@ cg.def = cg_def
 local cg_run = function(self, snippet, ...)
 	-- cheesy caching
 	if self.aot then
-		error(1, "can't run with AOT enabled")
+		error("can't run with AOT enabled", 1)
 	end
 	local v = self.C[snippet]
 	if v then return v(...) end
