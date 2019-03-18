@@ -1,7 +1,7 @@
 describe("#parser loads", function()
 	local p = require("src.parser")
 
-	local test = "(first (second arg))"
+	local test = "(first (second arg) arg)"
 	it("and parses basic string", function()
 		local expr = p.readsexpr(test)
 		assert.same("id", expr[1].type)
@@ -11,6 +11,12 @@ describe("#parser loads", function()
 	it("and dump equals input", function()
 		local expr = p.readsexpr(test)
 		assert.same(test, p.dumpexpr(expr))
+	end)
+
+	it("and parses/dumps complex exprs", function()
+		local complex = "(cond (((and true true) true)))"
+		local expr = p.readsexpr(complex)
+		assert.same(complex, p.dumpexpr(expr))
 	end)
 
 	-- invalid uses

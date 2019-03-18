@@ -40,7 +40,7 @@ end
 
 local function isexpr(node)
 	if type(node) == "table" then
-		return (cc.type == "expr")
+		return (node.type == "expr")
 	end
 	return true
 end
@@ -72,6 +72,7 @@ local function gencond(ev)
 			-- we need to make sure in both cases that expressions return values
 			-- get forwarded.
 			t[#t+1] = "if "
+
 			local cc = ev:parse(cond[1])
 			local check = {}
 			if isexpr(cc) then
@@ -95,19 +96,18 @@ local function gencond(ev)
 				-- TODO: wrap in function definition for caching?
 				branch.type = "anonf"
 				branch[1] = "return (function()"
-				branch[2] = cc
+				branch[2] = cb
 				branch[3] = "end)()"
 			end
 			t[#t+1] = branch
 			t[#t+1] = "end"
 		end
+		return t
 	end
 end
 
 return function(inst)
 	-- Forward vals
-	inst.vals["true"] = true
-	inst.vals["false"] = false
 	inst.vals["type"] = type
 
 	inst.vals["math"] = math

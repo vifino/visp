@@ -7,8 +7,10 @@ local parser = {}
 --  into the token, the token type, and the remainder.
 local patterns = {
 	{"^['()]", "char"},
-	{"^\"[^\"]*\"", "string"}, -- If escapes are needed, this needs special handling.
 	{"^[0-9.]+", "number"},
+	{"^true", "boolean"},
+	{"^false", "boolean"},
+	{"^\"[^\"]*\"", "string"}, -- If escapes are needed, this needs special handling.
 	{"^[^ \r\n\t'()]+", "id"}
 }
 
@@ -50,8 +52,14 @@ readsexpr = function(str)
 			end
 			return res, str
 		else
-			local elm = {tok}
-			elm.type = tkt
+			local elm = {
+				["type"] = tkt
+			}
+
+			if tkt == "number" then elm[1] = tonumber(tok)
+			elseif tkt == "boolean" then elm[1] = (tok == "true")
+			else elm[1] = tok end
+
 			if not found_exp then return elm end -- ooc expr
 			res[#res + 1] = elm
 		end
@@ -75,10 +83,10 @@ dumpexpr = function(expr)
 	for i=1, last do
 		local elm = expr[i]
 		if (not (type(elm) == "table" and elm.type)) then error("invalid sexpr tree?", 1) end
+		local space = (i == last) and "" or " "
 		if elm.type == "expr" then
-			str = str .. dumpexpr(elm)
+			str = str .. dumpexpr(elm) .. space
 		else
-			local space = (i == last) and "" or " "
 			local tok
 			if elm.type == "string" then
 				tok = '"'..elm[1]..'"' -- replace this

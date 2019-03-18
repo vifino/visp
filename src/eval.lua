@@ -25,6 +25,7 @@ end
 local parse_ast
 parse_ast = function(self, ast)
 	if (type(ast) ~= "table") or (ast.type == nil) then error("ast not ast??", 1) end
+
 	if ast.type == "id" then
 		return "("..ast[1]..")"
 	elseif ast.type == "expr" then
@@ -41,6 +42,7 @@ parse_ast = function(self, ast)
 			else
 				-- we don't know this function, just emit a call.
 				local g = {
+					["type"] = "expr",
 					"("..name.."("
 				}
 				local last = #ast
@@ -55,7 +57,8 @@ parse_ast = function(self, ast)
 			error("other cases not implemented yet")
 		end
 	else
-		return "("..ast[1]..")" -- strings, numbers, etc..
+		-- strings, numbers, etc..
+		return "("..tostring(ast[1])..")" -- close enough
 	end
 end
 eval.parse = parse_ast

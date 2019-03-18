@@ -25,6 +25,11 @@ visp.new = function()
 	return visp_init()
 end
 
+-- A debugging aid.
+visp.translate = function(self, code)
+	return self.eval.jit:parse(self.eval:translate(code))
+end
+
 local visp_run = function(self, code)
 	return self.eval:run(code)
 end
