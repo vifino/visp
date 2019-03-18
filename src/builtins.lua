@@ -13,7 +13,7 @@ local function genop1(_, op)
 	return function(ev, arg)
 		return {
 			["type"] = "expr",
-			op, ev:parse(first)
+			op, ev:parse(arg)
 		}
 	end
 end
@@ -45,7 +45,6 @@ local function isexpr(node)
 	return true
 end
 
-
 -- Conditional.
 -- (cond (
 --        (check branch)))
@@ -57,8 +56,6 @@ end
 -- at least 2 functions. One for the conditional, one for the branch.
 
 local function gencond(ev)
-	local gethash = ev.jit.gethash
-	--local condfns = ev.vals.condfns
 	return function(ev, conds)
 		if conds.type ~= "expr" then
 			error("conditional needs expr ast, got "..conds.type, 1)
@@ -108,12 +105,15 @@ local function gencond(ev)
 end
 
 return function(inst)
-	-- Initialize some values
-	inst.vals.condfns = {}
-
 	-- Forward vals
+	inst.vals["true"] = true
+	inst.vals["false"] = false
 	inst.vals["type"] = type
+
 	inst.vals["math"] = math
+
+	-- Conditionals
+	inst.cgfns["cond"] = gencond(inst)
 
 	-- Generate operators
 	local single_ops = {"#", "!", "-"}

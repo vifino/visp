@@ -8,7 +8,8 @@ local parser = {}
 local patterns = {
 	{"^['()]", "char"},
 	{"^\"[^\"]*\"", "string"}, -- If escapes are needed, this needs special handling.
-	{"^[^ \r\n\t'()]*", "id"}
+	{"^[0-9.]+", "number"},
+	{"^[^ \r\n\t'()]+", "id"}
 }
 
 local function tkn(s)
@@ -79,8 +80,11 @@ dumpexpr = function(expr)
 		else
 			local space = (i == last) and "" or " "
 			local tok
-			if elm.type == "id" then tok = elm[1]
-			elseif elm.type == "string" then tok = '"'..elm[1]..'"' end -- replace this
+			if elm.type == "string" then
+				tok = '"'..elm[1]..'"' -- replace this
+			else
+				tok = tostring(elm[1])
+			end
 			str = str .. tok .. space
 		end
 	end
