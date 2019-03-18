@@ -75,12 +75,11 @@ local function gencond(ev)
 
 			local cc = ev:parse(cond[1])
 			local check = {}
+			check.type = "expr"
 			if isexpr(cc) then
-				check.type = "expr"
 				check[1] = cc
 			else
-				-- TODO: wrap in function definition for caching?
-				check.type = "anonf"
+				-- TODO: wrap in function definition for caching? need to think about locals..
 				check[1] = "(function()"
 				check[2] = cc
 				check[3] = "end)()"
@@ -93,11 +92,13 @@ local function gencond(ev)
 			if isexpr(cb) then
 				branch = {"return", cb}
 			else
-				-- TODO: wrap in function definition for caching?
-				branch.type = "anonf"
-				branch[1] = "return (function()"
-				branch[2] = cb
-				branch[3] = "end)()"
+				-- TODO: check if function is needed
+				-- It doesn't seem to be on first glance.
+				-- After all, it'll return.
+				branch.type = "closure"
+				--branch[1] = "return (function()"
+				branch[1] = cb
+				--branch[3] = "end)()"
 			end
 			t[#t+1] = branch
 			t[#t+1] = "end"
