@@ -63,12 +63,27 @@ cg_parse = function(self, chain, depth) -- recursive solution
 	if type(chain) == "string" then return pad .. chain
 	elseif type(chain) ~= "table" then error("chain not string or table", 1) end
 
-	local out = {}
+	local out = {
+		["type"] = "expr"
+	}
 	for i=1, #chain do
 		local elem = chain[i]
 		local elt = type(elem)
 		if elt == "table" then
-			out[i] = cg_parse(self, elem, depth + 1)
+			local graph = cg_parse(self, elem, depth + 1)
+			if type(graph) == "table" then -- graph
+				if not graph.type then graph.type = "expr" end
+				if graph.type == "expr" and out.type == "expr" then
+					-- we are an expression still and so is the graph to be embedded
+					out[i] = graph
+				else
+					-- we or the graph is a closure
+					out.type = (graph.type ~= "expr" and graph.type) or "closure"
+					out[i] = graph
+				end
+			else -- edge
+				out[i] = graph
+			end
 		elseif elt == "function" then
 			if self.aot then
 				error("can't run compiled function in AOT mode", 1)
