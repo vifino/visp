@@ -6,7 +6,7 @@ local eval = {}
 local cg = require("src.codegen")
 local p = require("src.parser")
 
-local unpack = table.unpack
+local unpack = table.unpack or unpack
 
 -- New evaluator.
 eval.new = function()
@@ -42,7 +42,7 @@ parse_ast = function(self, ast)
 			else
 				-- we don't know this function, just emit a call.
 				local g = {
-					["type"] = "expr",
+a					["type"] = "expr",
 					"("..name.."("
 				}
 				local last = #ast
