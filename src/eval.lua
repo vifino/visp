@@ -56,9 +56,12 @@ parse_ast = function(self, ast)
 			-- TODO: fix this
 			error("other cases not implemented yet")
 		end
+	elseif ast.type == "string" then
+		-- TODO: replace with proper string escaping
+		return '"' .. ast[1] .. '"'
 	else
-		-- strings, numbers, etc..
-		return "("..tostring(ast[1])..")" -- close enough
+		-- bools, numbers, etc..
+		return tostring(ast[1]) -- close enough
 	end
 end
 eval.parse = parse_ast

@@ -7,7 +7,7 @@ local parser = {}
 --  into the token, the token type, and the remainder.
 local patterns = {
 	{"^['()]", "char"},
-	{"^[0-9.]+", "number"},
+	{"^-?[0-9]%.?[0-9]?+", "number"}, -- parses 1, -1, 1.0, -1.0, but no invalid numbers
 	{"^true", "boolean"},
 	{"^false", "boolean"},
 	{"^\"[^\"]*\"", "string"}, -- If escapes are needed, this needs special handling.
@@ -58,6 +58,12 @@ readsexpr = function(str)
 
 			if tkt == "number" then elm[1] = tonumber(tok)
 			elseif tkt == "boolean" then elm[1] = (tok == "true")
+			elseif tkt == "string" then
+				-- TODO: add proper string parsing.
+				-- This only works because none of the escapes are parsed.
+				-- In the JITted code, it'll just be embedded.
+				-- That will work, as Lua parses the escapes.
+				elm[1] = tok:sub(2, #tok - 1)
 			else elm[1] = tok end
 
 			if not found_exp then return elm end -- ooc expr
@@ -89,7 +95,8 @@ dumpexpr = function(expr)
 		else
 			local tok
 			if elm.type == "string" then
-				tok = '"'..elm[1]..'"' -- replace this
+				-- TODO: replace with proper escaping.
+				tok = '"'..elm[1]..'"'
 			else
 				tok = tostring(elm[1])
 			end

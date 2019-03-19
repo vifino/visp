@@ -144,8 +144,6 @@ describe("#visp", function()
 			end)
 
 			it("in cond (expr-closure)", function()
-				print(inst:translate("(cond (((and true true) (cond ((true (* 4 4))))))))"))
-
 				assert.same(16, inst:run("(cond (((and true true) (cond ((true (* 4 4))))))))"))
 				assert.is_falsy(inst:run("(cond (((and false false) (cond ((true (* 4 4))))))))"))
 			end)
