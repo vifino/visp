@@ -1,0 +1,76 @@
+-- Control statements.
+
+-- Helpers
+local function isexpr(node)
+	if type(node) == "table" then
+		return (node.type == "expr")
+	end
+	return true
+end
+
+-- Conditionals
+-- (cond (
+--        (check branch)))
+-- This is a bit more involved.
+-- Since we're a JIT, we don't have access to the actual
+-- code graph in the running code.
+-- The problem is "solved" by generating functions.
+-- Unfortunately, this results in the creation of
+-- at least 2 functions. One for the conditional, one for the branch.
+
+local function gencond(ev)
+	return function(ev, conds)
+		if conds.type ~= "expr" then
+			error("conditional needs expr ast, got "..conds.type, 1)
+		end
+		local nconds = #conds
+		local t = {
+			["type"] = "closure"
+		}
+		for i=1, nconds do
+			local cond = conds[i]
+			-- first is the check, second is the branch or value
+			-- check should be an expression, if it's not, it needs to be wrapped
+			-- branch is probably either a value (no brackets) or expr/branch
+			-- we need to make sure in both cases that expressions return values
+			-- get forwarded.
+			t[#t+1] = "if "
+
+			local cc = ev:parse(cond[1])
+			local check = {}
+			check.type = "expr"
+			if isexpr(cc) then
+				check[1] = cc
+			else
+				-- TODO: wrap in function definition for caching? need to think about locals..
+				check[1] = "(function()"
+				check[2] = cc
+				check[3] = "end)()"
+			end
+			t[#t+1] = check
+			t[#t+1] = " then"
+
+			local cb = ev:parse(cond[2])
+			local branch = {}
+			if isexpr(cb) then
+				branch = {"return", cb}
+			else
+				-- TODO: check if function is needed
+				-- It doesn't seem to be on first glance.
+				-- After all, it'll return.
+				branch.type = "closure"
+				--branch[1] = "return (function()"
+				branch[1] = cb
+				--branch[3] = "end)()"
+			end
+			t[#t+1] = branch
+			t[#t+1] = "end"
+		end
+		return t
+	end
+end
+
+return function(inst)
+	-- Conditionals
+	inst.cgfns["cond"] = gencond(inst)
+end
