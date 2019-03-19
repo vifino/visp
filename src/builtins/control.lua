@@ -1,6 +1,7 @@
 -- Control statements.
 
 -- Helpers
+local type = type
 local function isexpr(node)
 	if type(node) == "table" then
 		return (node.type == "expr")
@@ -51,14 +52,16 @@ local function gencond(ev)
 			t[#t+1] = " then"
 
 			local cb = ev:parse(cond[2])
-			local branch = {}
+			local branch = {
+				["type"] = "closure",
+				"return ",
+			}
 			if isexpr(cb) then
-				branch = {"return", cb}
+				branch[2] = cb
 			else
 				-- TODO: check if function is needed
 				-- It doesn't seem to be on first glance.
 				-- After all, it'll return.
-				branch.type = "closure"
 				--branch[1] = "return (function()"
 				branch[1] = cb
 				--branch[3] = "end)()"
