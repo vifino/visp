@@ -4,6 +4,7 @@ local builtins = {
 	"operatives",
 	"operators",
 	"control",
+	"test",
 }
 
 local loaders = {}

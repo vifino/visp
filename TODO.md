@@ -18,8 +18,12 @@
     - This is really important.
   - [?] Strings
 - [ ] Builtins
+  - [x] Operatives
+    - `oper`, `wrapoper`, `defoper`
+      - Enough to define lambda.
   - [x] Control statements
     - We got cond!
+  - [x] Comparisons
   - [ ] Global definition
     - [ ] Variables/Functions
     - [ ] Syntax
@@ -28,7 +32,7 @@
   - [ ] Char handling
   - [ ] List handling
   - [ ] String handling
-  - [ ] Comparisons
+  - [x] Testing
 - [ ] Scheme standard library.
 
 ## Stage 1 (Lisp compiler running on Stage 0)
