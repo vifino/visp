@@ -1,5 +1,11 @@
 language: python
-sudo: false
+distro: xenial
+
+addons:
+  apt:
+    update: true
+    packages:
+      - cloc
 
 env:
   - LUA="lua=5.1"
@@ -23,9 +29,12 @@ install:
   - luarocks install luacov
   - luarocks install cluacov
   - luarocks install luacov-coveralls
+  - luarocks install luacheck
 
 script:
   - make coverage LUA=lua
+  - make check
+  - make cloc
 
 after_success:
 - luacov-coveralls -e ~/lua_install

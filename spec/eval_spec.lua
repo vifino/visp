@@ -25,11 +25,11 @@ describe("#eval loads and", function()
 
 	it("can handle strings", function()
 		assert.same("Hello World!", inst:run('"Hello World!"'))
-	end) 
+	end)
 	pending("can handle strings with escapes", function()
 		assert.same("Hello\tWorld!\n", inst:run('"Hello\tWorld!\n"'))
-	end) 
-	
+	end)
+
 	it("can reference variables", function()
 		inst.vals["test"] = "Hello World!"
 

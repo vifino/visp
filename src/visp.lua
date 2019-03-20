@@ -1,7 +1,7 @@
 -- Lua visp JIT for bootstrapping.
 
-local cg = require("src.codegen")
-local parser = require("src.parser")
+--local cg = require("src.codegen")
+--local parser = require("src.parser")
 local eval = require("src.eval")
 local builtins = require("src.builtins")
 

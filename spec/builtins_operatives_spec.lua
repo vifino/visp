@@ -6,7 +6,7 @@ describe("#builtins #operatives", function()
 		local visp = require("src.visp")
 		inst = visp.new()
 	end)
-	
+
 	describe("oper", function()
 		it("simple arg-val pair", function()
 			local oper = inst:run("(oper (a) a)")
@@ -46,7 +46,7 @@ describe("#builtins #operatives", function()
 	describe("def-oper", function()
 		it("registers simple operatives", function()
 			local success = false
-			local oper = function(ev)
+			local oper = function()
 				success = true
 				return {}
 			end

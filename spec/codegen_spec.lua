@@ -69,7 +69,7 @@ describe("#codegen", function()
 			end)
 
 			describe("execution with", function()
-				local multilayer 
+				local multilayer
 				setup(function()
 					multilayer = inst:loadstr(inst:parse(multilayer_tree))
 				end)

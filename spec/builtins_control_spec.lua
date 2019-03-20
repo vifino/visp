@@ -5,7 +5,7 @@ describe("#builtins #control", function()
 	setup(function()
 		visp = require("src.visp")
 	end)
-	
+
 	it("initialize", function()
 		local inst = visp.new()
 		assert.same("table", type(inst))

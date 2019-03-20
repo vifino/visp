@@ -17,7 +17,6 @@
 local opers = {}
 
 local type = type
-local unpack = table.unpack or unpack
 local tconc = table.concat
 local gethash
 
@@ -140,8 +139,6 @@ return function(inst)
 	-- Bind essentials.
 	inst.vals["_eval_inst"] = inst
 	inst.vals["_cg_gethash"] = gethash
-	inst.vals["ast-pack"] = table.pack or pack
-	inst.vals["ast-unpack"] = unpack
 
 	inst.vals["ast-parse"] = function(ast)
 		return inst:parse(ast)

@@ -25,7 +25,7 @@ cg.new = function(aot_fh)
 		fh = aot_fh,
 	}
 	inst.G["_G"] = inst.G
-	setmetatable(inst, {["__index"] = cg})
+	sme(inst, {["__index"] = cg})
 	return inst
 end
 
@@ -58,7 +58,7 @@ cg.gethash = gethash
 
 local cg_parse
 cg_parse = function(self, chain, depth) -- recursive solution
-	local depth = depth or 0
+	depth = depth or 0
 	local pad = strrep("\t", depth)
 	if type(chain) == "string" then return pad .. chain
 	elseif type(chain) ~= "table" then error("chain not string or table", 1) end

@@ -19,8 +19,8 @@ end
 -- Unfortunately, this results in the creation of
 -- at least 2 functions. One for the conditional, one for the branch.
 
-local function gencond(ev)
-	return function(ev, conds)
+local function gencond(inst)
+	inst.cgfns["cond"] = function(ev, conds)
 		if conds.type ~= "expr" then
 			error("conditional needs expr ast, got "..conds.type, 1)
 		end
@@ -75,5 +75,5 @@ end
 
 return function(inst)
 	-- Conditionals
-	inst.cgfns["cond"] = gencond(inst)
+	gencond(inst)
 end

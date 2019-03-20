@@ -1,14 +1,14 @@
 -- Test Builtins autotest.
 describe("#builtins #autotest", function()
 	_G._BUSTED = true
-	visp = require("visp")
-	inst = visp.new()
+	local visp = require("visp")
+	local inst = visp.new()
 
 	local backend = inst.eval.vals["_testmod"]
 	if not backend then error("no backend table?") end
-	backend.test = function(self, title, checker, res)
+	backend.test = function(_, title, checker, expected)
 		it(title, function()
-			assert.same(res, checker())
+			assert.same(expected, checker())
 		end)
 	end
 

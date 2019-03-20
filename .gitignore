@@ -5,3 +5,6 @@
 
 # Coveralls config contains tokens.
 .coveralls.yml
+
+# Do not store luacov reports.
+luacov*

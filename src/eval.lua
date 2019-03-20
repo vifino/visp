@@ -71,7 +71,7 @@ eval.translate = function(self, code)
 end
 
 eval.run = function(self, code)
-	local code = parse_ast(self, p.readsexpr(code))
+	code = parse_ast(self, p.readsexpr(code))
 	return (self.jit):run(code)
 end
 

@@ -43,10 +43,10 @@ if is_testing then
 	end
 else
 	-- TODO: fill out
-	operatives.test = function(ev)
+	operatives.test = function()
 		return {}
 	end
-	operatives.tests = function(ev)
+	operatives.tests = function()
 		return {}
 	end
 end
@@ -55,19 +55,7 @@ end
 	-- Entry point
 return function(inst)
 	-- Test backends.
-	local backend = {}
-	if is_busted then
-		inst.testing = function()
-			print("Begun testing")
-			backend.test = function(self, title, check, res)
-				it(title, function()
-						 assert.same(res, check)
-				end)
-			end
-		end
-	end
-
-	fns["_testmod"] = backend
+	fns["_testmod"] = {}
 
 	for n, v in pairs(operatives) do
 		inst.cgfns[n] = v
