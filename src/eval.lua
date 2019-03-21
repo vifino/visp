@@ -33,16 +33,15 @@ parse_ast = function(self, ast)
 			["type"] = "expr",
 			"{",
 		}
-		local nexprs = #ast
 		for i=1, #ast do
-			local cg = parse_ast(ast[i])
-			if isexpr(cg) then
-				g[#g+1] = {cg, ","}
+			local sg = parse_ast(ast[i])
+			if isexpr(sg) then
+				g[#g+1] = {sg, ","}
 			else
 				g[#g+1] = {
 					["type"] = "expr",
 					"(function()",
-					cg,
+					sg,
 					"end)(),",
 				}
 			end

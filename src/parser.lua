@@ -134,10 +134,7 @@ local function readall(code)
 
 	while code and code ~= "" do
 		node, code = readexpr(code)
-		if node then
-			body[#body+1] = node
-			code = rem
-		end
+		if node then body[#body+1] = node end
 	end
 
 	if #body == 1 then
