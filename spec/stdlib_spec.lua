@@ -12,5 +12,5 @@ describe("#stdlib #autotest", function()
 		end)
 	end
 
-	inst:run('(include "src/stdlib/boot.lisp")')
+	inst:run('(include "stdlib/boot.lisp")')
 end)

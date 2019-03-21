@@ -26,6 +26,8 @@
     - This is really important.
   - [?] Strings
 - [ ] Builtins
+  - [x] Including files
+    - This is really important.
   - [x] Operatives
     - `oper`, `wrapoper`, `defoper`
       - Enough to define lambda.

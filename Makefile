@@ -25,3 +25,5 @@ cloc:
 	cloc --by-file src
 	# TESTS
 	cloc --by-file spec
+	# STDLIB
+	cloc --by-file stdlib
