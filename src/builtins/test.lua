@@ -19,18 +19,10 @@ local operatives = {}
 local fns = {}
 
 if is_testing then
-
 	-- Generic test interface.
-	local function isexpr(node)
-		if type(node) == "table" then
-			return (node.type == "expr")
-		end
-		return true
-	end
-
 	operatives.test = function(ev, title, check, res)
 		local checkg = ev:parse(check)
-		if isexpr(checkg) then
+		if ev.isexpr(checkg) then
 			checkg = {"return", checkg}
 		end
 

@@ -1,14 +1,5 @@
 -- Control statements.
 
--- Helpers
-local type = type
-local function isexpr(node)
-	if type(node) == "table" then
-		return (node.type == "expr")
-	end
-	return true
-end
-
 -- Conditionals
 -- (cond (
 --        (check branch)))
@@ -20,6 +11,7 @@ end
 -- at least 2 functions. One for the conditional, one for the branch.
 
 local function gencond(inst)
+	local isexpr = inst.isexpr
 	inst.cgfns["cond"] = function(ev, conds)
 		if conds.type ~= "expr" then
 			error("conditional needs expr ast, got "..conds.type, 1)

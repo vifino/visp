@@ -7,6 +7,8 @@ local cg = require("src.codegen")
 local p = require("src.parser")
 
 local unpack = table.unpack or unpack
+local isexpr = p.isexpr
+eval.isexpr = isexpr -- re export
 
 -- New evaluator.
 eval.new = function()
@@ -26,7 +28,28 @@ local parse_ast
 parse_ast = function(self, ast)
 	if (type(ast) ~= "table") or (ast.type == nil) then error("ast not ast??", 1) end
 
-	if ast.type == "id" then
+	if ast.type == "body" then -- multiple expressions
+		local g = {
+			["type"] = "expr",
+			"{",
+		}
+		local nexprs = #ast
+		for i=1, #ast do
+			local cg = parse_ast(ast[i])
+			if isexpr(cg) then
+				g[#g+1] = {cg, ","}
+			else
+				g[#g+1] = {
+					["type"] = "expr",
+					"(function()",
+					cg,
+					"end)(),",
+				}
+			end
+		end
+		g[#g+1] = "}"
+		return g
+	elseif ast.type == "id" then
 		return "("..ast[1]..")"
 	elseif ast.type == "expr" then
 		local fn = ast[1]
@@ -67,11 +90,11 @@ end
 eval.parse = parse_ast
 
 eval.translate = function(self, code)
-	return parse_ast(self, p.readsexpr(code))
+	return parse_ast(self, p.readall(code))
 end
 
 eval.run = function(self, code)
-	code = parse_ast(self, p.readsexpr(code))
+	code = parse_ast(self, p.readall(code))
 	return (self.jit):run(code)
 end
 

@@ -20,13 +20,6 @@ local type = type
 local tconc = table.concat
 local gethash
 
-local function isexpr(node)
-	if type(node) == "table" then
-		return (node.type == "expr")
-	end
-	return true
-end
-
 -- (oper (args body)) -> operative anonf
 -- Generates an anonymous function,
 -- not explicitly evaluating the arguments.
@@ -56,7 +49,7 @@ opers.oper = function(ev, args, body)
 		["type"] = "closure",
 		"return",
 	}
-	if isexpr(tbody) then
+	if ev.isexpr(tbody) then
 		closure[2] = tbody
 	else
 		closure[1] = tbody
