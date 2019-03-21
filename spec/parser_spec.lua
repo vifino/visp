@@ -30,6 +30,18 @@ describe("#parser loads and", function()
 		assert.same(nil, p.readexpr(";; hello world!"))
 	end)
 
+	it("handles multiple expressions with readall", function()
+		local expr = p.readall("(one) (two) (three)")
+		assert.same("body", expr.type)
+		assert.same(3, #expr)
+	end)
+
+	it("handles multiple expressions with readall and comments", function()
+		local expr = p.readall(";; this is one\n(one)\n;; this is two\n(two)\n(three)")
+		assert.same("body", expr.type)
+		assert.same(3, #expr)
+	end)
+
 	-- invalid uses
 	it("errors if reading invalid data", function()
 		assert.has.errors(function()

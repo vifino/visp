@@ -11,7 +11,8 @@ local tconc = table.concat
 -- For a string, removes whitespace, and splits it
 --  into the token, the token type, and the remainder.
 local patterns = {
-	{"^;.*[\r\n]*", "comment"},
+	{"^;+.-[\r\n]", "comment"},
+	{"^;+.-[^\r\n].*$", "comment"},
 	{"^['()]", "char"},
 	{"^-?[0-9]%.?[0-9]?+", "number"}, -- parses 1, -1, 1.0, -1.0, but no invalid numbers
 	{"^true", "boolean"},
@@ -47,37 +48,38 @@ readexpr = function(str)
 	repeat
 		tok, tkt, str = tkn(str)
 		if not tok then return nil end
-		if tkt ~= "comment" then -- discard those
-			if tok == "(" then -- start expression
-				if not found_exp then found_exp = true else
-					-- a sub expression
-					res[#res + 1], str = readexpr(ostr)
-				end
-			elseif tok == ")" then
-				if not found_exp then
-					error("unmatched parens (too many): "..sstr, 1)
-				end
-				return res, str
-			else
-				local elm = {
-					["type"] = tkt
-				}
-
-				if tkt == "number" then elm[1] = tonumber(tok)
-				elseif tkt == "boolean" then elm[1] = (tok == "true")
-				elseif tkt == "string" then
-					-- TODO: add proper string parsing.
-					-- This only works because none of the escapes are parsed.
-					-- In the JITted code, it'll just be embedded.
-					-- That will work, as Lua parses the escapes.
-					elm[1] = tok:sub(2, #tok - 1)
-				else elm[1] = tok end
-
-				if not found_exp then return elm end -- ooc expr
-				res[#res + 1] = elm
-			end
-			ostr = str
+		if tkt == "comment" then -- discard those
+			return nil, str
 		end
+		if tok == "(" then -- start expression
+			if not found_exp then found_exp = true else
+				-- a sub expression
+				res[#res + 1], str = readexpr(ostr)
+			end
+		elseif tok == ")" then
+			if not found_exp then
+				error("unmatched parens (too many): "..sstr, 1)
+			end
+			return res, str
+		else
+			local elm = {
+				["type"] = tkt
+			}
+
+			if tkt == "number" then elm[1] = tonumber(tok)
+			elseif tkt == "boolean" then elm[1] = (tok == "true")
+			elseif tkt == "string" then
+				-- TODO: add proper string parsing.
+				-- This only works because none of the escapes are parsed.
+				-- In the JITted code, it'll just be embedded.
+				-- That will work, as Lua parses the escapes.
+				elm[1] = tok:sub(2, #tok - 1)
+			else elm[1] = tok end
+
+			if not found_exp then return elm end -- ooc expr
+			res[#res + 1] = elm
+		end
+		ostr = str
 	until #str == 0
 
 	if found_exp then

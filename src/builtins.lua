@@ -1,6 +1,7 @@
 -- Builtins loader.
 
 local builtins = {
+	"include",
 	"operatives",
 	"operators",
 	"control",
