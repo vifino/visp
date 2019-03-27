@@ -21,7 +21,7 @@ end
 
 
 return function(inst)
-	local isexpr = inst.isexpr
+	local experize = inst.experize
 
 	inst.incpath = "."
 
@@ -46,14 +46,6 @@ return function(inst)
 		ev.incpath = dirname(fname)
 		local g = ev:translate(fc)
 		ev.incpath = oldinc
-		if isexpr(g) then
-			return g
-		end
-		return {
-			["type"] = "expr",
-			"(function()",
-			g,
-			"end)()"
-		}
+		return experize(g)
 	end
 end

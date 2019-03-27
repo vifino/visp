@@ -18,7 +18,6 @@ local opers = {}
 
 local type = type
 local tconc = table.concat
-local gethash
 
 -- (oper (args body)) -> operative anonf
 -- Generates an anonymous function,
@@ -44,17 +43,7 @@ opers.oper = function(ev, args, body)
 	}
 
 	-- Generate function body.
-	local tbody = ev:parse(body)
-	local closure = {
-		["type"] = "closure",
-		"return",
-	}
-	if ev.isexpr(tbody) then
-		closure[2] = tbody
-	else
-		closure[1] = tbody
-	end
-	t[#t+1] = closure
+	t[#t+1] = ev.closureize(ev:parse(body)) 
 
 	t[#t+1] = "end)"
 	return t
@@ -126,12 +115,9 @@ local function gendefoper(inst)
 end
 
 return function(inst)
-	-- Set up locals
-	gethash = inst.jit.gethash
-
 	-- Bind essentials.
 	inst.vals["_eval_inst"] = inst
-	inst.vals["_cg_gethash"] = gethash
+	inst.vals["_cg_gethash"] = inst.jit.gethash
 
 	inst.vals["ast-parse"] = function(ast)
 		return inst:parse(ast)

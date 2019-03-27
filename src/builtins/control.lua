@@ -12,6 +12,8 @@
 
 local function gencond(inst)
 	local isexpr = inst.isexpr
+	local experize = inst.experize
+
 	inst.cgfns["cond"] = function(ev, conds)
 		if conds.type ~= "expr" then
 			error("conditional needs expr ast, got "..conds.type, 1)
@@ -30,17 +32,7 @@ local function gencond(inst)
 			t[#t+1] = "if "
 
 			local cc = ev:parse(cond[1])
-			local check = {}
-			check.type = "expr"
-			if isexpr(cc) then
-				check[1] = cc
-			else
-				-- TODO: wrap in function definition for caching? need to think about locals..
-				check[1] = "(function()"
-				check[2] = cc
-				check[3] = "end)()"
-			end
-			t[#t+1] = check
+			t[#t+1] = experize(cc)
 			t[#t+1] = " then"
 
 			local cb = ev:parse(cond[2])

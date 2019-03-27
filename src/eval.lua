@@ -21,6 +21,38 @@ eval.new = function()
 	return n
 end
 
+-- Helpers
+local function experize(node, inlist)
+	local post = (inlist and ",") or ""
+	if isexpr(node) then
+		return {
+			["type"] = "expr",
+			node, post
+		}
+	end
+	return {
+		["type"] = "expr",
+		"(function(",
+		node,
+		"end)()" .. post
+	}
+end
+eval.experize = experize
+
+local function closureize(node)
+	local g = {
+		["type"] = "closure",
+		"return"
+	}
+	if isexpr(node) then
+		g[2] = node
+	else
+		g[1] = node
+	end
+	return g
+end
+eval.closureize = closureize
+
 -- Parse ast.
 -- Returns a codegen chain.
 -- Recursive, like everything else.
@@ -35,16 +67,7 @@ parse_ast = function(self, ast)
 		}
 		for i=1, #ast do
 			local sg = parse_ast(ast[i])
-			if isexpr(sg) then
-				g[#g+1] = {sg, ","}
-			else
-				g[#g+1] = {
-					["type"] = "expr",
-					"(function()",
-					sg,
-					"end)(),",
-				}
-			end
+			g[#g+1] = experize(sg, true)
 		end
 		g[#g+1] = "}"
 		return g
