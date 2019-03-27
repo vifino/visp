@@ -2,7 +2,7 @@
 -- Very simplistic, but handy.
 --
 -- Abstracts away the boundry of code vs graph vs obj.
--- Does JIT and AoT compilation.
+-- Does JIT compilation.
 -- Hopes to result in big functions being loaded,
 -- which'll improve performance.
 -- Note: No DCE/etc, 1:1 translation.
@@ -16,13 +16,11 @@ local sfe = setfenv
 local sme = setmetatable
 local strsub, strrep = string.sub, string.rep
 
-cg.new = function(aot_fh)
+cg.new = function()
 	local inst = {
 		C = {},
 		G = {},
 		fns = {},
-		aot=(aot_fh and true) or false,
-		fh = aot_fh,
 	}
 	inst.G["_G"] = inst.G
 	sme(inst, {["__index"] = cg})
@@ -85,9 +83,6 @@ cg_parse = function(self, chain, depth) -- recursive solution
 				out[i] = graph
 			end
 		elseif elt == "function" then
-			if self.aot then
-				error("can't run compiled function in AOT mode", 1)
-			end
 			local hash = "fcn_" .. gethash(elem)
 			self.G[hash] = elem
 			out[i] = pad .. "("..hash..")" -- not the best, but it'll do
@@ -113,11 +108,7 @@ local cg_def = function(self, name, chain)
 		v = cg_parse(self, chain, 1)
 		local fnbody = name.." = function(...)\n" .. v .. "\nend\n"
 
-		if self.aot then
-			self.fh:write("local " .. fnbody)
-		else
-			cg_loadstr(self, fnbody)()
-		end
+		cg_loadstr(self, fnbody)()
 		self.fns[name] = v
 	end
 	return "(" .. name .. ")"
@@ -126,9 +117,6 @@ cg.def = cg_def
 
 local cg_run = function(self, snippet, ...)
 	-- cheesy caching
-	if self.aot then
-		error("can't run with AOT enabled", 1)
-	end
 	local v = self.C[snippet]
 	if v then return v(...) end
 	v = cg_load(self, snippet)
