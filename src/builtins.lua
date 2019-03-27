@@ -4,6 +4,7 @@ local builtins = {
 	"include",
 	"operatives",
 	"operators",
+	"lists",
 	"control",
 	"test",
 }
