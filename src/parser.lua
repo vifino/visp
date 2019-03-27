@@ -142,13 +142,13 @@ local function readall(code)
 	if #body == 1 then
 		return body[1]
 	end
-	return (node and body) or nil
+	return body
 end
 parser.readall = readall
 
 local function isexpr(node)
 	if type(node) == "table" then
-		return (node.type == "expr")
+		return (not node.type) or (node.type == "expr")
 	end
 	return true
 end

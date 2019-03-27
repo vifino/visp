@@ -64,6 +64,23 @@ describe("#eval loads and", function()
 		assert.same(3, inst:run(code_call))
 	end)
 
+	it("does multiple expressions", function()
+		inst.vals.add = nil
+		inst.cgfns.add = function(ev, a, b)
+			return {
+				ev:parse(a),
+				" + ",
+				ev:parse(b),
+			}
+		end
+		local code = "(add 1 1) (add 2 2)"
+		local r = inst:run(code)
+		assert.same("table", type(r))
+		assert.same(2, #r)
+		assert.same(2, r[1])
+		assert.same(4, r[2])
+	end)
+
 	-- invalid uses/failures
 	it("fails if parsing with no arguments", function()
 		assert.has.errors(function()

@@ -58,7 +58,7 @@ eval.closureize = closureize
 -- Recursive, like everything else.
 local parse_ast
 parse_ast = function(self, ast)
-	if (type(ast) ~= "table") or (ast.type == nil) then error("ast not ast??", 1) end
+	if (type(ast) ~= "table") or (ast.type == nil) then error("ast not ast?? "..type(ast), 1) end
 
 	if ast.type == "body" then -- multiple expressions
 		local g = {
@@ -66,7 +66,7 @@ parse_ast = function(self, ast)
 			"{",
 		}
 		for i=1, #ast do
-			local sg = parse_ast(ast[i])
+			local sg = parse_ast(self, ast[i])
 			g[#g+1] = experize(sg, true)
 		end
 		g[#g+1] = "}"

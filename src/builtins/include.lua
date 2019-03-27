@@ -46,6 +46,7 @@ return function(inst)
 		ev.incpath = dirname(fname)
 		local g = ev:translate(fc)
 		ev.incpath = oldinc
-		return experize(g)
+		if g then return experize(g) end
+		return {}
 	end
 end
